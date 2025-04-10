@@ -5,7 +5,7 @@ import AuthUtil from './auth.js';
 
 const ApiUtil = {
   // Base URL for API requests
-  baseUrl: 'http://localhost:3000/api',
+  baseUrl: 'https://auto-journal-browser-extension.onrender.com/api',
 
   /**
    * Make a GET request to the API

@@ -53,7 +53,7 @@ MONGODB_URI=mongodb://localhost:27017/auto-journal
 GEMINI_API_KEY=your_gemini_api_key
 
 # CORS Configuration
-ALLOWED_ORIGINS=chrome-extension://your-extension-id,http://localhost:3000
+ALLOWED_ORIGINS=chrome-extension://your-extension-id,https://auto-journal-browser-extension.onrender.com
 
 # Security
 JWT_SECRET=your_jwt_secret_for_future_auth
@@ -68,7 +68,7 @@ cd ..  # Return to the root directory
 npm start
 ```
 
-The server should now be running at http://localhost:3000.
+The server should now be running at https://auto-journal-browser-extension.onrender.com.
 
 ### 5. Install the Browser Extension
 

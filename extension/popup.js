@@ -7,7 +7,7 @@ import { createAuthContainer } from './components/login.js';
 
 // Configuration
 const config = {
-  apiBaseUrl: 'http://localhost:3000',
+  apiBaseUrl: 'https://auto-journal-browser-extension.onrender.com',
   entriesPerPage: 10,
   maxSummaryLength: 150
 };
@@ -34,6 +34,7 @@ let highlightsData = [];
 let settings = {
   loggingEnabled: true,
   contentCaptureEnabled: true,
+  screenshotEnabled: true,
   blacklistedDomains: ['mail.google.com', 'online-banking', 'accounts.google.com']
 };
 
@@ -374,10 +375,16 @@ function setupEventListeners() {
   // Screenshot toggle
   const screenshotToggle = document.getElementById('screenshot-toggle');
   if (screenshotToggle) {
+    // Make sure it's initialized with the current setting
+    screenshotToggle.checked = settings.screenshotEnabled !== false; // Default to true if not set
+
     screenshotToggle.addEventListener('change', () => {
+      console.log('Screenshot toggle changed:', screenshotToggle.checked);
       settings.screenshotEnabled = screenshotToggle.checked;
       saveSettings();
     });
+  } else {
+    console.error('Screenshot toggle element not found');
   }
 
   // Edit blacklist
@@ -461,7 +468,14 @@ function switchTab(tabName) {
 
 // Save settings
 function saveSettings() {
-  chrome.storage.local.set({ settings });
+  console.log('Saving settings:', settings);
+  chrome.storage.local.set({ settings }, () => {
+    if (chrome.runtime.lastError) {
+      console.error('Error saving settings:', chrome.runtime.lastError);
+    } else {
+      console.log('Settings saved successfully');
+    }
+  });
 }
 
 // Format date

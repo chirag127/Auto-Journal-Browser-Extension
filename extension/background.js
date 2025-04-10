@@ -3,7 +3,7 @@
 
 // Configuration
 const config = {
-  apiBaseUrl: 'http://localhost:3000',
+  apiBaseUrl: 'https://auto-journal-browser-extension.onrender.com',
   contentCaptureEnabled: true,
   loggingEnabled: true,
   screenshotEnabled: true, // Whether to capture screenshots
@@ -16,14 +16,31 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log('Auto-Journal extension installed');
 
   // Initialize storage with default settings
-  chrome.storage.local.set({
-    settings: {
-      loggingEnabled: config.loggingEnabled,
-      contentCaptureEnabled: config.contentCaptureEnabled,
-      screenshotEnabled: config.screenshotEnabled,
-      blacklistedDomains: config.blacklistedDomains
-    },
-    journalEntries: []
+  chrome.storage.local.get(['settings', 'journalEntries'], (data) => {
+    const existingSettings = data.settings || {};
+    const existingEntries = data.journalEntries || [];
+
+    // Create merged settings object
+    const mergedSettings = {
+      loggingEnabled: existingSettings.loggingEnabled !== undefined ? existingSettings.loggingEnabled : config.loggingEnabled,
+      contentCaptureEnabled: existingSettings.contentCaptureEnabled !== undefined ? existingSettings.contentCaptureEnabled : config.contentCaptureEnabled,
+      screenshotEnabled: existingSettings.screenshotEnabled !== undefined ? existingSettings.screenshotEnabled : config.screenshotEnabled,
+      blacklistedDomains: existingSettings.blacklistedDomains || config.blacklistedDomains
+    };
+
+    console.log('Initializing with settings:', mergedSettings);
+
+    // Save settings and keep existing entries
+    chrome.storage.local.set({
+      settings: mergedSettings,
+      journalEntries: existingEntries
+    }, () => {
+      if (chrome.runtime.lastError) {
+        console.error('Error initializing settings:', chrome.runtime.lastError);
+      } else {
+        console.log('Settings initialized successfully');
+      }
+    });
   });
 
   // Create context menu for highlighting
@@ -82,13 +99,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       // Skip if screenshot capture is disabled
       if (settings.screenshotEnabled === false) {
+        console.log('Screenshot capture is disabled in settings');
         sendResponse({ screenshot: null });
         return;
       }
 
+      console.log('Attempting to capture screenshot...');
+
       // Capture screenshot of the current tab
       captureScreenshot(sender.tab.id)
         .then(dataUrl => {
+          console.log('Screenshot captured, sending response');
           sendResponse({ screenshot: dataUrl });
         })
         .catch(error => {
@@ -109,14 +130,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 async function captureScreenshot(tabId) {
   return new Promise((resolve, reject) => {
     try {
-      chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
-        if (chrome.runtime.lastError) {
-          reject(chrome.runtime.lastError);
-        } else {
-          resolve(dataUrl);
+      // Use chrome.tabs.captureVisibleTab to capture the current tab
+      chrome.tabs.captureVisibleTab(
+        null, // Use the current window
+        { format: 'png', quality: 80 }, // Format and quality
+        (dataUrl) => {
+          if (chrome.runtime.lastError) {
+            console.error('Error capturing screenshot:', chrome.runtime.lastError);
+            reject(chrome.runtime.lastError);
+          } else {
+            console.log('Screenshot captured successfully');
+            resolve(dataUrl);
+          }
         }
-      });
+      );
     } catch (error) {
+      console.error('Exception capturing screenshot:', error);
       reject(error);
     }
   });

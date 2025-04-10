@@ -6,10 +6,11 @@ const axios = require('axios');
 
 // Configuration
 const config = {
-  baseUrl: 'http://localhost:3000/api',
+  baseUrl: 'https://auto-journal-browser-extension.onrender.com/api',
   testUrl: 'https://example.com',
   testTitle: 'Example Domain',
-  testText: 'This domain is for use in illustrative examples in documents. You may use this domain in literature without prior coordination or asking for permission. More information...'
+  testText:
+    'This domain is for use in illustrative examples in documents. You may use this domain in literature without prior coordination or asking for permission. More information...',
 };
 
 // Test functions
@@ -18,13 +19,13 @@ const tests = {
   testLogPageVisit: async () => {
     try {
       console.log('Testing log page visit...');
-      
+
       const response = await axios.post(`${config.baseUrl}/log`, {
         url: config.testUrl,
         title: config.testTitle,
-        text: config.testText
+        text: config.testText,
       });
-      
+
       console.log('Log page visit response:', response.data);
       return response.data;
     } catch (error) {
@@ -32,18 +33,18 @@ const tests = {
       throw error;
     }
   },
-  
+
   // Test summarizing content
   testSummarizeContent: async () => {
     try {
       console.log('Testing summarize content...');
-      
+
       const response = await axios.post(`${config.baseUrl}/summarize`, {
         url: config.testUrl,
         title: config.testTitle,
-        text: config.testText
+        text: config.testText,
       });
-      
+
       console.log('Summarize content response:', response.data);
       return response.data;
     } catch (error) {
@@ -51,14 +52,14 @@ const tests = {
       throw error;
     }
   },
-  
+
   // Test getting journal entries
   testGetJournalEntries: async () => {
     try {
       console.log('Testing get journal entries...');
-      
+
       const response = await axios.get(`${config.baseUrl}/journal`);
-      
+
       console.log('Get journal entries response:', response.data);
       return response.data;
     } catch (error) {
@@ -66,14 +67,14 @@ const tests = {
       throw error;
     }
   },
-  
+
   // Test searching journal entries
   testSearchJournalEntries: async () => {
     try {
       console.log('Testing search journal entries...');
-      
+
       const response = await axios.get(`${config.baseUrl}/journal/search?q=example`);
-      
+
       console.log('Search journal entries response:', response.data);
       return response.data;
     } catch (error) {
@@ -81,18 +82,18 @@ const tests = {
       throw error;
     }
   },
-  
+
   // Test adding a highlight
   testAddHighlight: async () => {
     try {
       console.log('Testing add highlight...');
-      
+
       const response = await axios.post(`${config.baseUrl}/journal/highlight`, {
         url: config.testUrl,
         text: 'This domain is for use in illustrative examples in documents.',
-        note: 'Example highlight note'
+        note: 'Example highlight note',
       });
-      
+
       console.log('Add highlight response:', response.data);
       return response.data;
     } catch (error) {
@@ -100,46 +101,46 @@ const tests = {
       throw error;
     }
   },
-  
+
   // Test getting tags
   testGetTags: async () => {
     try {
       console.log('Testing get tags...');
-      
+
       const response = await axios.get(`${config.baseUrl}/tags`);
-      
+
       console.log('Get tags response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error testing get tags:', error.response?.data || error.message);
       throw error;
     }
-  }
+  },
 };
 
 // Run all tests
 async function runAllTests() {
   try {
     console.log('Running all tests...');
-    
+
     // Log page visit
     await tests.testLogPageVisit();
-    
+
     // Summarize content
     await tests.testSummarizeContent();
-    
+
     // Get journal entries
     await tests.testGetJournalEntries();
-    
+
     // Search journal entries
     await tests.testSearchJournalEntries();
-    
+
     // Add highlight
     await tests.testAddHighlight();
-    
+
     // Get tags
     await tests.testGetTags();
-    
+
     console.log('All tests completed successfully!');
   } catch (error) {
     console.error('Error running tests:', error);

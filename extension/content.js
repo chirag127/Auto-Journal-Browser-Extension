@@ -11,16 +11,21 @@ const config = {
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'getPageContent') {
-    // Extract page content
-    const content = extractPageContent();
+    // Extract page content (async function)
+    extractPageContent().then(content => {
+      console.log('Content extracted, sending to background script');
 
-    // Send content back to background script
-    chrome.runtime.sendMessage({
-      action: 'pageContent',
-      data: content
+      // Send content back to background script
+      chrome.runtime.sendMessage({
+        action: 'pageContent',
+        data: content
+      });
+
+      sendResponse({ status: 'content extraction started' });
+    }).catch(error => {
+      console.error('Error in content extraction:', error);
+      sendResponse({ status: 'content extraction failed', error: error.message });
     });
-
-    sendResponse({ status: 'content extracted' });
   }
 
   // Return true to indicate async response
@@ -28,7 +33,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 // Extract page content
-function extractPageContent() {
+async function extractPageContent() {
   try {
     // Get the main content of the page
     const mainContent = getMainContent();
@@ -42,8 +47,18 @@ function extractPageContent() {
 
     // Capture screenshot if enabled
     let screenshot = null;
-    if (config.captureScreenshot) {
-      screenshot = captureVisibleScreenshot();
+
+    // Check if screenshot capture is enabled in settings
+    const settings = await new Promise(resolve => {
+      chrome.storage.local.get('settings', data => resolve(data.settings || {}));
+    });
+
+    if (settings.screenshotEnabled !== false && config.captureScreenshot) {
+      console.log('Attempting to capture screenshot');
+      screenshot = await captureVisibleScreenshot();
+      console.log('Screenshot captured:', screenshot ? 'success' : 'failed');
+    } else {
+      console.log('Screenshot capture is disabled in settings or config');
     }
 
     return {
@@ -65,18 +80,26 @@ function extractPageContent() {
 // Capture visible screenshot
 async function captureVisibleScreenshot() {
   try {
+    console.log('Content script requesting screenshot capture');
+
     // Send a message to the background script to capture the screenshot
     return new Promise((resolve) => {
-      chrome.runtime.sendMessage({ action: 'captureScreenshot' }, (response) => {
+      // Create a message handler to receive the response
+      const messageHandler = (response) => {
+        console.log('Received screenshot response:', response ? 'has data' : 'no data');
         if (response && response.screenshot) {
           resolve(response.screenshot);
         } else {
           resolve(null);
         }
-      });
+      };
+
+      // Send the message to the background script
+      chrome.runtime.sendMessage({ action: 'captureScreenshot' }, messageHandler);
 
       // Set a timeout in case the background script doesn't respond
       setTimeout(() => {
+        console.log('Screenshot capture timed out');
         resolve(null);
       }, 5000);
     });

@@ -7,7 +7,7 @@ This document provides detailed information about the Auto-Journal API endpoints
 All API endpoints are relative to the base URL:
 
 ```
-http://localhost:3000/api
+https://auto-journal-browser-extension.onrender.com/api
 ```
 
 ## Authentication

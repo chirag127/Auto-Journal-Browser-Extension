@@ -27,14 +27,23 @@ exports.logPageVisit = async (req, res) => {
     let screenshotUrl = '';
     if (screenshot) {
       try {
+        console.log('Attempting to upload screenshot');
+
         // Remove the data:image/png;base64, prefix if present
         const base64Data = screenshot.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
-        screenshotUrl = await uploadToFreeImageHost(base64Data);
-        console.log('Screenshot uploaded:', screenshotUrl);
+
+        if (base64Data) {
+          screenshotUrl = await uploadToFreeImageHost(base64Data);
+          console.log('Screenshot uploaded successfully:', screenshotUrl);
+        } else {
+          console.error('Invalid screenshot data');
+        }
       } catch (uploadError) {
         console.error('Error uploading screenshot:', uploadError);
         // Continue without screenshot if upload fails
       }
+    } else {
+      console.log('No screenshot provided');
     }
 
     if (entry) {

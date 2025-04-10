@@ -33,22 +33,22 @@ const backButton = document.getElementById('back-button');
 document.addEventListener('DOMContentLoaded', async () => {
   // Check if user is authenticated
   const isAuthenticated = await AuthUtil.isAuthenticated();
-  
+
   if (!isAuthenticated) {
     // Redirect to popup for authentication
     window.close();
     return;
   }
-  
+
   // Set up event listeners
   setupEventListeners();
-  
+
   // Load journal entries
   await loadJournalEntries();
-  
+
   // Extract categories and tags
   extractCategoriesAndTags();
-  
+
   // Populate filter dropdowns
   populateFilters();
 });
@@ -59,27 +59,27 @@ function setupEventListeners() {
   backButton.addEventListener('click', () => {
     window.close();
   });
-  
+
   // Search input
   searchInput.addEventListener('input', () => {
     filterEntries();
   });
-  
+
   // Category filter
   categoryFilter.addEventListener('change', () => {
     filterEntries();
   });
-  
+
   // Tag filter
   tagFilter.addEventListener('change', () => {
     filterEntries();
   });
-  
+
   // Date filters
   startDateInput.addEventListener('change', () => {
     filterEntries();
   });
-  
+
   endDateInput.addEventListener('change', () => {
     filterEntries();
   });
@@ -90,40 +90,40 @@ async function loadJournalEntries() {
   try {
     // Show loading state
     showLoadingState();
-    
+
     // Get entries from storage first (for faster initial load)
     const { journalEntries } = await new Promise(resolve => {
       chrome.storage.local.get('journalEntries', resolve);
     });
-    
+
     if (journalEntries && journalEntries.length > 0) {
       journalData = journalEntries;
-      
+
       // Sort by visit time (newest first)
       journalData.sort((a, b) => new Date(b.visitTime) - new Date(a.visitTime));
-      
+
       // Update UI
       filteredData = [...journalData];
       renderJournalEntries();
     }
-    
+
     // Try to get entries from API
     try {
       const response = await ApiUtil.getJournal();
-      
+
       if (response && response.entries && response.entries.length > 0) {
         journalData = response.entries;
-        
+
         // Sort by visit time (newest first)
         journalData.sort((a, b) => new Date(b.visitTime) - new Date(a.visitTime));
-        
+
         // Update UI
         filteredData = [...journalData];
         renderJournalEntries();
-        
+
         // Extract categories and tags
         extractCategoriesAndTags();
-        
+
         // Populate filter dropdowns
         populateFilters();
       }
@@ -141,7 +141,7 @@ async function loadJournalEntries() {
 function extractCategoriesAndTags() {
   // Extract categories
   categories = [...new Set(journalData.map(entry => entry.category).filter(Boolean))];
-  
+
   // Extract tags
   const allTags = journalData.flatMap(entry => entry.tags || []);
   tags = [...new Set(allTags)];
@@ -157,7 +157,7 @@ function populateFilters() {
     option.textContent = category;
     categoryFilter.appendChild(option);
   });
-  
+
   // Populate tag filter
   tagFilter.innerHTML = '<option value="">All Tags</option>';
   tags.forEach(tag => {
@@ -175,12 +175,12 @@ function filterEntries() {
   const tagValue = tagFilter.value;
   const startDate = startDateInput.value ? new Date(startDateInput.value) : null;
   const endDate = endDateInput.value ? new Date(endDateInput.value) : null;
-  
+
   // If end date is provided, set it to the end of the day
   if (endDate) {
     endDate.setHours(23, 59, 59, 999);
   }
-  
+
   // Filter entries
   filteredData = journalData.filter(entry => {
     // Search query filter
@@ -189,41 +189,41 @@ function filterEntries() {
       const matchesContent = entry.content.text && entry.content.text.toLowerCase().includes(searchQuery);
       const matchesSummary = entry.content.summary && entry.content.summary.toLowerCase().includes(searchQuery);
       const matchesTags = entry.tags && entry.tags.some(tag => tag.toLowerCase().includes(searchQuery));
-      
+
       if (!(matchesTitle || matchesContent || matchesSummary || matchesTags)) {
         return false;
       }
     }
-    
+
     // Category filter
     if (categoryValue && entry.category !== categoryValue) {
       return false;
     }
-    
+
     // Tag filter
     if (tagValue && (!entry.tags || !entry.tags.includes(tagValue))) {
       return false;
     }
-    
+
     // Date range filter
     if (startDate || endDate) {
       const entryDate = new Date(entry.visitTime);
-      
+
       if (startDate && entryDate < startDate) {
         return false;
       }
-      
+
       if (endDate && entryDate > endDate) {
         return false;
       }
     }
-    
+
     return true;
   });
-  
+
   // Reset to first page
   currentPage = 1;
-  
+
   // Render filtered entries
   renderJournalEntries();
 }
@@ -232,31 +232,31 @@ function filterEntries() {
 function renderJournalEntries() {
   // Hide loading state
   hideLoadingState();
-  
+
   // Check if there are entries to display
   if (filteredData.length === 0) {
     showEmptyState();
     return;
   }
-  
+
   // Hide empty state
   hideEmptyState();
-  
+
   // Calculate pagination
   const totalPages = Math.ceil(filteredData.length / config.entriesPerPage);
   const startIndex = (currentPage - 1) * config.entriesPerPage;
   const endIndex = Math.min(startIndex + config.entriesPerPage, filteredData.length);
   const currentEntries = filteredData.slice(startIndex, endIndex);
-  
+
   // Clear existing entries
   journalEntriesContainer.innerHTML = '';
-  
+
   // Add entries
   currentEntries.forEach(entry => {
     const entryElement = createJournalEntryElement(entry);
     journalEntriesContainer.appendChild(entryElement);
   });
-  
+
   // Render pagination
   renderPagination(totalPages);
 }
@@ -265,22 +265,22 @@ function renderJournalEntries() {
 function createJournalEntryElement(entry) {
   const entryElement = document.createElement('div');
   entryElement.className = 'journal-entry';
-  
+
   // Format date
   const visitDate = new Date(entry.visitTime);
   const formattedDate = formatDate(visitDate);
-  
+
   // Truncate summary
   const summary = entry.content.summary || 'No summary available';
   const truncatedSummary = summary.length > config.maxSummaryLength
     ? summary.substring(0, config.maxSummaryLength) + '...'
     : summary;
-  
+
   // Create tags HTML
   const tagsHtml = entry.tags && entry.tags.length > 0
     ? entry.tags.map(tag => `<div class="tag">${tag}</div>`).join('')
     : '';
-  
+
   // Create highlights HTML
   const highlightsHtml = entry.highlights && entry.highlights.length > 0
     ? entry.highlights.map(highlight => `
@@ -290,18 +290,22 @@ function createJournalEntryElement(entry) {
       </div>
     `).join('')
     : '';
-  
+
   // Create screenshot HTML
-  const screenshotHtml = entry.screenshot
-    ? `
+  let screenshotHtml = '';
+  if (entry.screenshot && entry.screenshot.length > 10) {
+    console.log('Entry has screenshot URL:', entry.screenshot);
+    screenshotHtml = `
       <div class="entry-screenshot">
         <a href="${entry.screenshot}" target="_blank">
           <img src="${entry.screenshot}" alt="Screenshot" class="screenshot-img">
         </a>
       </div>
-    `
-    : '';
-  
+    `;
+  } else {
+    console.log('Entry has no screenshot');
+  }
+
   // Set HTML
   entryElement.innerHTML = `
     <div class="entry-header">
@@ -324,19 +328,19 @@ function createJournalEntryElement(entry) {
       <div class="entry-action" data-action="delete" data-url="${entry.url}">Delete</div>
     </div>
   `;
-  
+
   // Add event listeners
   const viewAction = entryElement.querySelector('[data-action="view"]');
   const deleteAction = entryElement.querySelector('[data-action="delete"]');
-  
+
   viewAction.addEventListener('click', () => {
     chrome.tabs.create({ url: entry.url });
   });
-  
+
   deleteAction.addEventListener('click', () => {
     deleteJournalEntry(entry.url);
   });
-  
+
   return entryElement;
 }
 
@@ -344,12 +348,12 @@ function createJournalEntryElement(entry) {
 function renderPagination(totalPages) {
   // Clear existing pagination
   paginationContainer.innerHTML = '';
-  
+
   // Don't show pagination if there's only one page
   if (totalPages <= 1) {
     return;
   }
-  
+
   // Previous button
   const prevButton = document.createElement('button');
   prevButton.className = 'pagination-button';
@@ -362,12 +366,12 @@ function renderPagination(totalPages) {
     }
   });
   paginationContainer.appendChild(prevButton);
-  
+
   // Page buttons
   const maxButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxButtons - 1);
-  
+
   for (let i = startPage; i <= endPage; i++) {
     const pageButton = document.createElement('button');
     pageButton.className = `pagination-button ${i === currentPage ? 'active' : ''}`;
@@ -378,7 +382,7 @@ function renderPagination(totalPages) {
     });
     paginationContainer.appendChild(pageButton);
   }
-  
+
   // Next button
   const nextButton = document.createElement('button');
   nextButton.className = 'pagination-button';
@@ -398,7 +402,7 @@ async function deleteJournalEntry(url) {
   if (!confirm('Are you sure you want to delete this journal entry?')) {
     return;
   }
-  
+
   try {
     // Delete from API
     try {
@@ -407,24 +411,24 @@ async function deleteJournalEntry(url) {
       console.error('Error deleting entry from API:', apiError);
       // Continue with local deletion if API fails
     }
-    
+
     // Delete from local storage
     chrome.storage.local.get('journalEntries', (data) => {
       if (data.journalEntries) {
         const updatedEntries = data.journalEntries.filter(entry => entry.url !== url);
-        
+
         // Update storage
         chrome.storage.local.set({ journalEntries: updatedEntries }, () => {
           // Update local data
           journalData = journalData.filter(entry => entry.url !== url);
           filteredData = filteredData.filter(entry => entry.url !== url);
-          
+
           // Re-render entries
           renderJournalEntries();
-          
+
           // Extract categories and tags
           extractCategoriesAndTags();
-          
+
           // Populate filter dropdowns
           populateFilters();
         });
@@ -463,15 +467,15 @@ function formatDate(date) {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-  
+
   const isToday = date.getDate() === today.getDate() &&
                  date.getMonth() === today.getMonth() &&
                  date.getFullYear() === today.getFullYear();
-  
+
   const isYesterday = date.getDate() === yesterday.getDate() &&
                      date.getMonth() === yesterday.getMonth() &&
                      date.getFullYear() === yesterday.getFullYear();
-  
+
   if (isToday) {
     return `Today at ${formatTime(date)}`;
   } else if (isYesterday) {
