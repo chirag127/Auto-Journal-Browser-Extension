@@ -95,6 +95,12 @@ function loadSettings() {
       // Update UI
       loggingToggle.checked = settings.loggingEnabled;
       contentToggle.checked = settings.contentCaptureEnabled;
+
+      // Update screenshot toggle if it exists
+      const screenshotToggle = document.getElementById('screenshot-toggle');
+      if (screenshotToggle) {
+        screenshotToggle.checked = settings.screenshotEnabled !== false; // Default to true if not set
+      }
     }
   });
 }
@@ -311,6 +317,14 @@ function setupEventListeners() {
     switchTab('settings');
   });
 
+  // History button
+  const historyButton = document.getElementById('history-button');
+  if (historyButton) {
+    historyButton.addEventListener('click', () => {
+      chrome.tabs.create({ url: 'history.html' });
+    });
+  }
+
   // Logout button
   const logoutButton = document.getElementById('logout-button');
   if (logoutButton) {
@@ -356,6 +370,15 @@ function setupEventListeners() {
     settings.contentCaptureEnabled = contentToggle.checked;
     saveSettings();
   });
+
+  // Screenshot toggle
+  const screenshotToggle = document.getElementById('screenshot-toggle');
+  if (screenshotToggle) {
+    screenshotToggle.addEventListener('change', () => {
+      settings.screenshotEnabled = screenshotToggle.checked;
+      saveSettings();
+    });
+  }
 
   // Edit blacklist
   editBlacklist.addEventListener('click', () => {

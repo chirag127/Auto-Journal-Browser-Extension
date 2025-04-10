@@ -4,7 +4,8 @@
 // Configuration
 const config = {
   maxContentLength: 1000, // Maximum number of words to capture
-  highlightClass: 'auto-journal-highlight'
+  highlightClass: 'auto-journal-highlight',
+  captureScreenshot: true // Whether to capture screenshots
 };
 
 // Listen for messages from background script
@@ -12,16 +13,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'getPageContent') {
     // Extract page content
     const content = extractPageContent();
-    
+
     // Send content back to background script
     chrome.runtime.sendMessage({
       action: 'pageContent',
       data: content
     });
-    
+
     sendResponse({ status: 'content extracted' });
   }
-  
+
   // Return true to indicate async response
   return true;
 });
@@ -31,18 +32,25 @@ function extractPageContent() {
   try {
     // Get the main content of the page
     const mainContent = getMainContent();
-    
+
     // Extract text content
     const textContent = mainContent.textContent || '';
-    
+
     // Limit to max content length (words)
     const words = textContent.split(/\\s+/);
     const limitedText = words.slice(0, config.maxContentLength).join(' ').trim();
-    
+
+    // Capture screenshot if enabled
+    let screenshot = null;
+    if (config.captureScreenshot) {
+      screenshot = captureVisibleScreenshot();
+    }
+
     return {
       text: limitedText,
       title: document.title,
-      url: window.location.href
+      url: window.location.href,
+      screenshot: screenshot
     };
   } catch (error) {
     console.error('Error extracting page content:', error);
@@ -51,6 +59,30 @@ function extractPageContent() {
       title: document.title,
       url: window.location.href
     };
+  }
+}
+
+// Capture visible screenshot
+async function captureVisibleScreenshot() {
+  try {
+    // Send a message to the background script to capture the screenshot
+    return new Promise((resolve) => {
+      chrome.runtime.sendMessage({ action: 'captureScreenshot' }, (response) => {
+        if (response && response.screenshot) {
+          resolve(response.screenshot);
+        } else {
+          resolve(null);
+        }
+      });
+
+      // Set a timeout in case the background script doesn't respond
+      setTimeout(() => {
+        resolve(null);
+      }, 5000);
+    });
+  } catch (error) {
+    console.error('Error capturing screenshot:', error);
+    return null;
   }
 }
 
@@ -70,7 +102,7 @@ function getMainContent() {
     '.main',
     'section'
   ];
-  
+
   // Try each selector
   for (const selector of contentSelectors) {
     const element = document.querySelector(selector);
@@ -78,7 +110,7 @@ function getMainContent() {
       return element;
     }
   }
-  
+
   // If no suitable element found, use the body
   return document.body;
 }
@@ -86,7 +118,7 @@ function getMainContent() {
 // Set up highlight functionality
 document.addEventListener('mouseup', function(event) {
   const selection = window.getSelection();
-  
+
   if (selection.toString().length > 0) {
     // Show highlight button
     showHighlightButton(selection, event);
@@ -106,7 +138,7 @@ function showHighlightButton(selection, event) {
   if (existingButton) {
     existingButton.remove();
   }
-  
+
   // Create highlight button
   const button = document.createElement('div');
   button.id = 'auto-journal-highlight-button';
@@ -120,23 +152,23 @@ function showHighlightButton(selection, event) {
   button.style.fontSize = '12px';
   button.style.cursor = 'pointer';
   button.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-  
+
   // Position the button near the selection
   const range = selection.getRangeAt(0);
   const rect = range.getBoundingClientRect();
-  
+
   button.style.top = `${window.scrollY + rect.bottom + 5}px`;
   button.style.left = `${window.scrollX + rect.left}px`;
-  
+
   // Add click event
   button.addEventListener('click', function() {
     saveHighlight(selection.toString());
     button.remove();
   });
-  
+
   // Add to document
   document.body.appendChild(button);
-  
+
   // Auto-remove after 3 seconds
   setTimeout(() => {
     if (document.body.contains(button)) {
@@ -148,13 +180,13 @@ function showHighlightButton(selection, event) {
 // Save highlight
 function saveHighlight(text) {
   if (!text) return;
-  
+
   // Send highlight to background script
   chrome.runtime.sendMessage({
     action: 'saveHighlight',
     text: text
   });
-  
+
   // Show confirmation toast
   showToast('Highlight saved to Auto-Journal');
 }
@@ -174,14 +206,14 @@ function showToast(message) {
   toast.style.zIndex = '10000';
   toast.style.opacity = '0';
   toast.style.transition = 'opacity 0.3s';
-  
+
   document.body.appendChild(toast);
-  
+
   // Fade in
   setTimeout(() => {
     toast.style.opacity = '1';
   }, 10);
-  
+
   // Remove after 3 seconds
   setTimeout(() => {
     toast.style.opacity = '0';
