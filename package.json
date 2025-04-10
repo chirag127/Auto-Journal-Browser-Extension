@@ -1,0 +1,35 @@
+{
+  "name": "auto-journal",
+  "version": "1.0.0",
+  "description": "AI-powered browsing activity logger and summarizer",
+  "main": "index.js",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev",
+    "install:backend": "cd backend && npm install",
+    "install:all": "npm install && npm run install:backend",
+    "package": "node package-extension.js",
+    "test:backend": "cd backend && node test.js",
+    "test": "npm run test:backend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chirag127/Auto-Journal-Browser-Extension.git"
+  },
+  "keywords": [
+    "browser-extension",
+    "ai",
+    "journal",
+    "gemini",
+    "chrome-extension"
+  ],
+  "author": "Chirag Singhal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chirag127/Auto-Journal-Browser-Extension/issues"
+  },
+  "homepage": "https://github.com/chirag127/Auto-Journal-Browser-Extension#readme",
+  "dependencies": {
+    "archiver": "^5.3.1"
+  }
+}

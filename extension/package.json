@@ -1,0 +1,12 @@
+{
+  "name": "auto-journal-extension",
+  "version": "1.0.0",
+  "description": "AI-powered browsing activity logger and summarizer",
+  "main": "background.js",
+  "scripts": {
+    "build": "echo \"No build step required for vanilla JS extension\" && exit 0",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Chirag Singhal",
+  "license": "MIT"
+}
