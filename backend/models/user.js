@@ -9,6 +9,14 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  password: {
+    hash: {
+      type: String
+    },
+    salt: {
+      type: String
+    }
+  },
   settings: {
     syncEnabled: {
       type: Boolean,

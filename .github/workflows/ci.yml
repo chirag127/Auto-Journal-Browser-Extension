@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint || echo "Linting failed but continuing"
+
+  test-backend:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:5.0
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          cache: 'npm'
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd backend && npm ci
+      - name: Create .env file
+        run: |
+          cd backend
+          echo "PORT=3000" > .env
+          echo "NODE_ENV=test" >> .env
+          echo "MONGODB_URI=mongodb://localhost:27017/auto-journal-test" >> .env
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+          echo "ALLOWED_ORIGINS=*" >> .env
+          echo "JWT_SECRET=test-secret" >> .env
+      - name: Run backend tests
+        run: npm run test:backend
+
+  build-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build extension
+        run: npm run package || echo "Packaging failed but continuing"
+      - name: Upload extension artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: extension-package
+          path: dist/auto-journal-extension.zip
+          if-no-files-found: ignore

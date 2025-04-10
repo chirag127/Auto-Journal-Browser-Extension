@@ -19,6 +19,7 @@ const logRoutes = require('./routes/logRoutes');
 const summaryRoutes = require('./routes/summaryRoutes');
 const journalRoutes = require('./routes/journalRoutes');
 const tagRoutes = require('./routes/tagRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 // Create Express app
 const app = express();
@@ -49,6 +50,7 @@ app.use('/api/log', logRoutes);
 app.use('/api/summarize', summaryRoutes);
 app.use('/api/journal', journalRoutes);
 app.use('/api/tags', tagRoutes);
+app.use('/api/auth', authRoutes);
 
 // Root route
 app.get('/', (req, res) => {

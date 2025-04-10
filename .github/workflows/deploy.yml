@@ -1,0 +1,40 @@
+name: Deploy
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd backend && npm ci
+      
+      - name: Build extension
+        run: npm run package
+      
+      - name: Upload extension to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dist/auto-journal-extension.zip
+          asset_name: auto-journal-extension.zip
+          tag: ${{ github.ref }}
+          overwrite: true
+      
+      # This is a placeholder for backend deployment
+      # In a real-world scenario, you would deploy to a cloud provider
+      - name: Deploy backend (placeholder)
+        run: |
+          echo "This is a placeholder for backend deployment"
+          echo "In a real-world scenario, you would deploy to a cloud provider like Heroku, Render, or AWS"
