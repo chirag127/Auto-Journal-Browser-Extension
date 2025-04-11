@@ -12,7 +12,8 @@
     "test:backend": "cd backend && node test.js",
     "test": "npm run test:backend",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "convert-icons": "node convert-icons.js"
   },
   "repository": {
     "type": "git",
@@ -32,7 +33,8 @@
   },
   "homepage": "https://github.com/chirag127/Auto-Journal-Browser-Extension#readme",
   "dependencies": {
-    "archiver": "^5.3.1"
+    "archiver": "^5.3.1",
+    "sharp": "^0.33.2"
   },
   "devDependencies": {
     "eslint": "^8.38.0",
