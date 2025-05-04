@@ -1,0 +1,8 @@
+theme: jekyll-theme-cayman
+title: Auto-Journal Browser Extension
+description: AI-powered browsing activity logger and summarizer
+show_downloads: true
+github:
+  repository_url: https://github.com/chirag127/Auto-Journal-Browser-Extension
+  zip_url: https://github.com/chirag127/Auto-Journal-Browser-Extension/archive/refs/heads/main.zip
+  tar_url: https://github.com/chirag127/Auto-Journal-Browser-Extension/archive/refs/heads/main.tar.gz

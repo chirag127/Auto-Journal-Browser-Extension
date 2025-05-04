@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto-Journal - AI-powered Browsing Activity Logger</title>
+  <link rel="icon" href="extension/icons/icon16.png" type="image/png">
+  <style>
+    :root {
+      --primary-color: #4285F4;
+      --secondary-color: #34A853;
+      --accent-color: #FBBC05;
+      --danger-color: #EA4335;
+      --dark-bg: #121212;
+      --dark-surface: #1E1E1E;
+      --dark-card: #2D2D2D;
+      --text-primary: #FFFFFF;
+      --text-secondary: #B0B0B0;
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 1.5rem;
+      --spacing-lg: 2rem;
+      --spacing-xl: 3rem;
+      --border-radius: 8px;
+      --transition-speed: 0.3s;
+      --max-width: 1200px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--dark-bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: color var(--transition-speed);
+    }
+
+    a:hover {
+      color: var(--accent-color);
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--spacing-md);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 1.5rem;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+      text-align: center;
+      border: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #3b77db;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
+    }
+
+    .btn-secondary {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background-color: #2d9549;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(52, 168, 83, 0.3);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    /* Header */
+    header {
+      background-color: var(--dark-surface);
+      padding: var(--spacing-md) 0;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .logo img {
+      width: 48px;
+      height: 48px;
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: var(--spacing-md);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: calc(var(--spacing-xl) * 2) 0 var(--spacing-xl);
+      background: linear-gradient(135deg, var(--dark-bg), var(--dark-surface));
+      text-align: center;
+      margin-top: 60px;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: var(--spacing-md);
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      max-width: 800px;
+      margin: 0 auto var(--spacing-lg);
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: var(--spacing-md);
+      justify-content: center;
+      margin-top: var(--spacing-lg);
+    }
+
+    /* About Section */
+    .about {
+      padding: var(--spacing-xl) 0;
+      background-color: var(--dark-surface);
+    }
+
+    .section-title {
+      font-size: 2.2rem;
+      margin-bottom: var(--spacing-lg);
+      text-align: center;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      margin: var(--spacing-xs) auto 0;
+      border-radius: 2px;
+    }
+
+    /* Features Section */
+    .features {
+      padding: var(--spacing-xl) 0;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--spacing-lg);
+      margin-top: var(--spacing-lg);
+    }
+
+    .feature-card {
+      background-color: var(--dark-card);
+      border-radius: var(--border-radius);
+      padding: var(--spacing-lg);
+      transition: transform var(--transition-speed);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: var(--spacing-sm);
+      color: var(--primary-color);
+    }
+
+    .feature-title {
+      font-size: 1.3rem;
+      margin-bottom: var(--spacing-sm);
+      color: var(--primary-color);
+    }
+
+    /* Installation Section */
+    .installation {
+      padding: var(--spacing-xl) 0;
+      background-color: var(--dark-surface);
+    }
+
+    .installation-steps {
+      margin-top: var(--spacing-lg);
+    }
+
+    .step {
+      display: flex;
+      margin-bottom: var(--spacing-md);
+      background-color: var(--dark-card);
+      border-radius: var(--border-radius);
+      padding: var(--spacing-md);
+      align-items: flex-start;
+    }
+
+    .step-number {
+      background-color: var(--primary-color);
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: var(--spacing-md);
+      flex-shrink: 0;
+    }
+
+    .step-content h3 {
+      margin-bottom: var(--spacing-xs);
+      color: var(--text-primary);
+    }
+
+    .step-content p {
+      color: var(--text-secondary);
+    }
+
+    /* How to Use Section */
+    .how-to-use {
+      padding: var(--spacing-xl) 0;
+    }
+
+    /* Tech Stack Section */
+    .tech-stack {
+      padding: var(--spacing-xl) 0;
+      background-color: var(--dark-surface);
+    }
+
+    .tech-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+      justify-content: center;
+      margin-top: var(--spacing-lg);
+    }
+
+    .tech-item {
+      background-color: var(--dark-card);
+      border-radius: var(--border-radius);
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--dark-surface);
+      padding: var(--spacing-lg) 0;
+      margin-top: var(--spacing-xl);
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: var(--spacing-md);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+
+      .hero p {
+        font-size: 1rem;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .header-content {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+      }
+
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-links {
+        margin-top: var(--spacing-sm);
+        justify-content: center;
+      }
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate {
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    .delay-1 {
+      animation-delay: 0.2s;
+    }
+
+    .delay-2 {
+      animation-delay: 0.4s;
+    }
+
+    .delay-3 {
+      animation-delay: 0.6s;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container header-content">
+      <div class="logo">
+        <img src="extension/icons/icon48.png" alt="Auto-Journal Logo">
+        <span class="logo-text">Auto-Journal</span>
+      </div>
+      <div class="nav-links">
+        <a href="https://github.com/chirag127/Auto-Journal-Browser-Extension" target="_blank">GitHub</a>
+        <a href="privacy-policy.html" target="_blank">Privacy Policy</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="animate">Auto-Journal</h1>
+      <p class="animate delay-1">AI-powered browsing activity logger and summarizer that helps you remember and organize what you learn online.</p>
+      <div class="hero-buttons animate delay-2">
+        <a href="https://github.com/chirag127/Auto-Journal-Browser-Extension" class="btn btn-primary" target="_blank">View on GitHub</a>
+        <a href="#installation" class="btn btn-outline">Installation Guide</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about" id="about">
+    <div class="container">
+      <h2 class="section-title">About Auto-Journal</h2>
+      <p>Auto-Journal is a browser extension that passively logs your browsing activity, summarizes the content using AI, and organizes it into a searchable personal knowledge journal. It helps you remember what you've learned online, save important snippets, and build a personal knowledge base without any manual effort.</p>
+      <p>With Auto-Journal, you can easily track your online research, automatically generate summaries of pages you visit, highlight and save important text, and search through your browsing history with powerful filters and tags.</p>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="container">
+      <h2 class="section-title">Key Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📝</div>
+          <h3 class="feature-title">Auto-Logging</h3>
+          <p>Automatically logs page visits, titles, and timestamps. Optionally captures the first 500–1000 words of visible text.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3 class="feature-title">AI Summarization</h3>
+          <p>Uses Gemini 2.0 Flash Lite to summarize each visited page. Runs summarization on backend via Express.js API.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">✨</div>
+          <h3 class="feature-title">Highlight & Save</h3>
+          <p>Allows you to highlight any text and save it as a "thought" or snippet. AI generates a short note or summary from the highlight.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📔</div>
+          <h3 class="feature-title">Journal View</h3>
+          <p>Displays a daily journal of what was browsed with timestamps, page titles, and summaries. Searchable by keyword, tag, or date.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🏷️</div>
+          <h3 class="feature-title">Tags & Categorization</h3>
+          <p>Auto-tags pages using content categories (e.g., Tech, Health, Design). Users can manually tag or re-categorize entries.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3 class="feature-title">Privacy Controls</h3>
+          <p>Private by default — no syncing to cloud unless explicitly enabled. Toggle to pause logging or exclude specific domains.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation Section -->
+  <section class="installation" id="installation">
+    <div class="container">
+      <h2 class="section-title">Installation Guide</h2>
+      <div class="installation-steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Clone the Repository</h3>
+            <p>Clone the Auto-Journal repository from GitHub:</p>
+            <pre><code>git clone https://github.com/chirag127/Auto-Journal-Browser-Extension.git</code></pre>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Open Chrome Extensions Page</h3>
+            <p>Open Chrome and navigate to <code>chrome://extensions/</code></p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Enable Developer Mode</h3>
+            <p>Toggle the "Developer mode" switch in the top-right corner of the extensions page.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>Load the Extension</h3>
+            <p>Click "Load unpacked" and select the <code>extension</code> folder from the cloned repository.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">5</div>
+          <div class="step-content">
+            <h3>Configure Settings (Optional)</h3>
+            <p>Click on the Auto-Journal icon in your browser toolbar and adjust settings as needed.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How to Use Section -->
+  <section class="how-to-use" id="how-to-use">
+    <div class="container">
+      <h2 class="section-title">How to Use</h2>
+      <div class="installation-steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Browse Normally</h3>
+            <p>Auto-Journal works in the background, automatically logging pages you visit and generating summaries.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Highlight Text</h3>
+            <p>Select any text on a webpage, right-click, and choose "Save to Auto-Journal" to save it as a highlight.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>View Your Journal</h3>
+            <p>Click the Auto-Journal icon in your browser toolbar to open the popup and view your journal entries.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>Search and Filter</h3>
+            <p>Use the search bar and filters to find specific entries by keyword, tag, or date.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">5</div>
+          <div class="step-content">
+            <h3>Manage Privacy</h3>
+            <p>Use the settings tab to blacklist domains, toggle logging, or manage your data.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack Section -->
+  <section class="tech-stack" id="tech-stack">
+    <div class="container">
+      <h2 class="section-title">Technology Stack</h2>
+      <div class="tech-list">
+        <div class="tech-item">Manifest V3</div>
+        <div class="tech-item">HTML5</div>
+        <div class="tech-item">CSS3</div>
+        <div class="tech-item">Vanilla JavaScript</div>
+        <div class="tech-item">Express.js</div>
+        <div class="tech-item">MongoDB</div>
+        <div class="tech-item">Gemini 2.0 Flash Lite API</div>
+        <div class="tech-item">Chrome Extension API</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-content">
+      <div>
+        <p>&copy; 2024 Auto-Journal. Created by Chirag Singhal.</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/chirag127/Auto-Journal-Browser-Extension" target="_blank">GitHub</a>
+        <a href="privacy-policy.html" target="_blank">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    // Reveal animations on scroll
+    const revealElements = document.querySelectorAll('.feature-card, .step');
+    
+    function reveal() {
+      revealElements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        
+        if (elementTop < windowHeight - 100) {
+          element.classList.add('animate');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', reveal);
+    reveal(); // Initial check
+  </script>
+</body>
+</html>

@@ -1,23 +1,30 @@
-# Auto-Journal Browser Extension
+# 📘 Auto-Journal Browser Extension
 
-## Overview
+AI-powered browsing activity logger and summarizer that helps you remember and organize what you learn online.
+
+## ✨ Description
 
 Auto-Journal is an AI-powered browser extension that passively logs your browsing activity, summarizes content using Gemini 2.0 Flash Lite, and organizes it into a searchable personal knowledge journal. It helps knowledge workers track what they've read, reflect on it, and extract key insights from their daily web browsing.
 
-## Key Features
+## 🚀 Live Demo
 
--   **Auto-Logging**: Automatically logs page visits, titles, and timestamps
--   **AI Summarization**: Uses Gemini 2.0 Flash Lite to summarize visited pages
--   **Highlight & Save**: Save selected text as thoughts or snippets with AI-generated notes
--   **Journal View**: Searchable daily journal of browsing activity
--   **Tags & Categorization**: Auto-tags pages and supports manual categorization
--   **Privacy Controls**: Private by default with domain blacklisting and pause functionality
+Visit our website: [https://chirag127.github.io/Auto-Journal-Browser-Extension](https://chirag127.github.io/Auto-Journal-Browser-Extension)
 
-## Tech Stack
+## 🧪 Features
 
--   **Frontend**: Browser Extension (Manifest V3) with HTML, CSS, and Vanilla JS
--   **Backend**: Express.js server with MongoDB for storage
--   **AI**: Gemini 2.0 Flash Lite API for content summarization
+- **Auto-Logging**: Automatically logs page visits, titles, and timestamps
+- **AI Summarization**: Uses Gemini 2.0 Flash Lite to summarize visited pages
+- **Highlight & Save**: Save selected text as thoughts or snippets with AI-generated notes
+- **Journal View**: Searchable daily journal of browsing activity
+- **Tags & Categorization**: Auto-tags pages and supports manual categorization
+- **Privacy Controls**: Private by default with domain blacklisting and pause functionality
+
+## 🛠️ Tech Stack / Tools Used
+
+- **Frontend**: Browser Extension (Manifest V3) with HTML, CSS, and Vanilla JS
+- **Backend**: Express.js server with MongoDB for storage
+- **AI**: Gemini 2.0 Flash Lite API for content summarization
+- **Tools**: Node.js, npm, Git
 
 ## Project Structure
 
@@ -64,7 +71,7 @@ Auto-Journal-Browser-Extension/
 └── README.md                # Project documentation
 ```
 
-## Installation
+## 📦 Installation Instructions
 
 ### Extension
 
@@ -80,13 +87,25 @@ Auto-Journal-Browser-Extension/
 3. Create a `.env` file based on `.env.example`
 4. Run `npm start` to start the server
 
+## 🔧 Usage
+
+1. **Browse Normally**: Auto-Journal works in the background, automatically logging pages you visit and generating summaries.
+2. **Highlight Text**: Select any text on a webpage, right-click, and choose "Save to Auto-Journal" to save it as a highlight.
+3. **View Your Journal**: Click the Auto-Journal icon in your browser toolbar to open the popup and view your journal entries.
+4. **Search and Filter**: Use the search bar and filters to find specific entries by keyword, tag, or date.
+5. **Manage Privacy**: Use the settings tab to blacklist domains, toggle logging, or manage your data.
+
+## 📸 Screenshots
+
+_Coming soon_
+
 ## Development
 
 ### Prerequisites
 
--   Node.js and npm
--   MongoDB (local or Atlas)
--   Gemini API key
+- Node.js and npm
+- MongoDB (local or Atlas)
+- Gemini API key
 
 ### Setup
 
@@ -99,27 +118,27 @@ Auto-Journal-Browser-Extension/
 
 ### Logging
 
--   `POST /api/log` - Log a page visit
--   `GET /api/log/stats` - Get logging statistics
+- `POST /api/log` - Log a page visit
+- `GET /api/log/stats` - Get logging statistics
 
 ### Summarization
 
--   `POST /api/summarize` - Summarize page content
--   `POST /api/summarize/highlight` - Summarize highlighted text
+- `POST /api/summarize` - Summarize page content
+- `POST /api/summarize/highlight` - Summarize highlighted text
 
 ### Journal
 
--   `GET /api/journal` - Get all journal entries
--   `GET /api/journal/search` - Search journal entries
--   `GET /api/journal/:url` - Get a specific journal entry by URL
--   `DELETE /api/journal/:url` - Delete a journal entry
--   `POST /api/journal/highlight` - Add a highlight to a journal entry
+- `GET /api/journal` - Get all journal entries
+- `GET /api/journal/search` - Search journal entries
+- `GET /api/journal/:url` - Get a specific journal entry by URL
+- `DELETE /api/journal/:url` - Delete a journal entry
+- `POST /api/journal/highlight` - Add a highlight to a journal entry
 
 ### Tags
 
--   `GET /api/tags` - Get all tags
--   `PATCH /api/tags/:url` - Update tags for a journal entry
--   `GET /api/tags/categories` - Get all tag categories
+- `GET /api/tags` - Get all tags
+- `PATCH /api/tags/:url` - Update tags for a journal entry
+- `GET /api/tags/categories` - Get all tag categories
 
 ## Data Models
 
@@ -150,12 +169,24 @@ Auto-Journal-Browser-Extension/
 
 ## Future Enhancements
 
--   GPT-style chatbot that can answer "What did I read last week about AI?"
--   Auto-export to GitHub
--   Mood/tone detection of content consumed
--   Graph view of reading connections (à la Roam/Obsidian)
--   OAuth2 login support for syncing across devices
+- GPT-style chatbot that can answer "What did I read last week about AI?"
+- Auto-export to GitHub
+- Mood/tone detection of content consumed
+- Graph view of reading connections (à la Roam/Obsidian)
+- OAuth2 login support for syncing across devices
 
-## License
+## 🙌 Contributing
 
-MIT
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+## 🪪 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
