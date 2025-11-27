@@ -34,7 +34,7 @@
   "homepage": "https://github.com/chirag127/Auto-Journal-Browser-Extension#readme",
   "dependencies": {
     "archiver": "^5.3.1",
-    "sharp": "^0.33.2"
+    "sharp": "^0.34.4"
   },
   "devDependencies": {
     "eslint": "^8.38.0",
